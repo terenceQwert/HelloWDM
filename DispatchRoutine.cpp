@@ -7,7 +7,7 @@ extern "C"
 }
 #endif
 #include "HelloWDMCommon.h"
-#pragma PAGECODE
+#pragma PAGEDCODE
 NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 {
 
@@ -66,7 +66,7 @@ NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 }
 
 
-#pragma PAGECODE
+#pragma PAGEDCODE
 NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
 {
 
@@ -84,7 +84,7 @@ NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
   return Status;
 }
 
-#pragma PAGECODE
+#pragma PAGEDCODE
 NTSTATUS
 HelloWDMWrite(PDEVICE_OBJECT pDevObj, PIRP pIrp)
 {

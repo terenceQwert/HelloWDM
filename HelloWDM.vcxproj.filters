@@ -37,6 +37,12 @@
     <ClCompile Include="Enum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DeviceRemove.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceCapability.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="HelloWDM.inx">
@@ -51,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Enum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PciCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -25,8 +25,19 @@ NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT fdo, IN PIRP Irp);
 NTSTATUS HelloWDMWrite(PDEVICE_OBJECT pDevObj, PIRP pIrp);
 NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp);
 NTSTATUS HelloWDMDeviceIoControl(IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS DefaultPnpHandler(PDEVICE_EXTENSION pdx, PIRP Irp);
+
+NTSTATUS ForwardAndWait(PDEVICE_EXTENSION pdx, PIRP pIrp);
 
 NTSTATUS HandleStartDevice(PDEVICE_EXTENSION pdx, PIRP pIrp);
+NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP Irp);
+NTSTATUS PnpQueryCapabilitiesHandler(IN PDEVICE_EXTENSION pdx, IN PIRP irp);
+
+#define SetMostPoweredState( SystemState, OurDeviceState)	\
+	dps = deviceCapabilities->DeviceState[SystemState];		\
+	if( dps==PowerDeviceUnspecified || dps>OurDeviceState)	\
+		deviceCapabilities->DeviceState[SystemState] = OurDeviceState
+
 
 // Direct I/O method
 NTSTATUS HelloWDMDirectIoRead(IN PDEVICE_OBJECT, IN PIRP);

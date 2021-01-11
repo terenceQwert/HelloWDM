@@ -170,7 +170,9 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DeviceCapability.cpp" />
     <ClCompile Include="DeviceIoControl.cpp" />
+    <ClCompile Include="DeviceRemove.cpp" />
     <ClCompile Include="DirectIoMethod.cpp" />
     <ClCompile Include="DispatchRoutine.cpp" />
     <ClCompile Include="Enum.cpp" />
@@ -184,6 +186,7 @@
     <ClInclude Include="Enum.h" />
     <ClInclude Include="HelloWDMCommon.h" />
     <ClInclude Include="HelloWdmIoControl.h" />
+    <ClInclude Include="PciCommon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
