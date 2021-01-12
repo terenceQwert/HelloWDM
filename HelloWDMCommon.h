@@ -33,6 +33,10 @@ NTSTATUS HandleStartDevice(PDEVICE_EXTENSION pdx, PIRP pIrp);
 NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP Irp);
 NTSTATUS PnpQueryCapabilitiesHandler(IN PDEVICE_EXTENSION pdx, IN PIRP irp);
 
+
+VOID ShowResources(IN PCM_PARTIAL_RESOURCE_LIST list);
+
+
 #define SetMostPoweredState( SystemState, OurDeviceState)	\
 	dps = deviceCapabilities->DeviceState[SystemState];		\
 	if( dps==PowerDeviceUnspecified || dps>OurDeviceState)	\
