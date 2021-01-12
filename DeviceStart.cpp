@@ -23,6 +23,7 @@ NTSTATUS HandleStartDevice(
   {
     pIrp->IoStatus.Status = status;
     IoCompleteRequest(pIrp, IO_NO_INCREMENT);
+    return status;
   }
 
   PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(pIrp);
