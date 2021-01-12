@@ -102,13 +102,3 @@ typedef struct _PCI_COMMON_CONFIG {
 
 } PCI_COMMON_CONFIG, *PPCI_COMMON_CONFIG;
 
-typedef struct _PCI_SLOT_NUMBER {
-  union {
-    struct {
-      ULONG   FunctionNumber : 3;
-      ULONG   DeviceNumber : 5;
-      ULONG   Reserved : 24;
-    } bits;
-    ULONG   AsULONG;
-  } u;
-} PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;

@@ -8,7 +8,12 @@ extern "C"
 #endif
 #include "HelloWDMCommon.h"
 #include "Enum.h"
-#include "PciCommon.h"
+// #include "PciCommon.h"
+/*
+** these two APIs HalGetBusData & HalSetBusData are depricated.
+*/
+
+#if 0
 VOID EnumeratePCI()
 {
   ULONG bus=0;
@@ -30,6 +35,8 @@ VOID EnumeratePCI()
     }
   }
 }
+
+#endif
 
 #pragma PAGEDCODE
 NTSTATUS HelloWDMDeviceIoControl(
