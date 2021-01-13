@@ -5,8 +5,8 @@
 #include <Windows.h>
 #include <SetupAPI.h>
 #include <winioctl.h>
-#include "../HelloWDM_1/HelloWdmIoControl.h"
-#include "../HelloWDM_1/PciCommon.h"
+#include "../HelloWdmIoControl.h"
+#include "../PciCommon.h"
 #if 0
 void _cdecl operator delete (void *pointer)
 {
@@ -15,6 +15,16 @@ void _cdecl operator delete (void *pointer)
   pointer = NULL;
 }
 #endif
+typedef struct _PCI_SLOT_NUMBER {
+  union {
+    struct {
+      ULONG   DeviceNumber : 5;
+      ULONG   FunctionNumber : 3;
+      ULONG   Reserved : 24;
+    } bits;
+    ULONG   AsULONG;
+  } u;
+} PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
 
 
 using namespace std;
