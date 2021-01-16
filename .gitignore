@@ -195,3 +195,8 @@ Debug/HelloWDM.tlog/signtool.write.1.tlog
 Debug/HelloWDM.tlog/stampinf.command.1.tlog
 Debug/HelloWDM.tlog/stampinf.read.1.tlog
 Debug/HelloWDM.tlog/stampinf.write.1.tlog
+/.vs
+/ARM/Debug
+/ARM64/Debug
+/ConsoleApplication1/Debug
+*.user
