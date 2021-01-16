@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <SetupAPI.h>
 #include <winioctl.h>
+#include <process.h>
 #include "appFunction.h"
 #include "../HelloWdmIoControl.h"
 #include "../PciCommon.h"
@@ -177,6 +178,14 @@ int main()
 #endif
   DisplayPCIConfiguration(hDevice, 2, 0, 0);
   IOCTL(hDevice);
+#if DRIVER_START_IO
+  HANDLE hThread[2];
+  hThread[0] = (HANDLE)_beginthreadex(NULL, 0, Thread, &hDevice, 0, NULL);
+  hThread[1] = (HANDLE)_beginthreadex(NULL, 0, Thread, &hDevice, 0, NULL);
+
+  WaitForMultipleObjects(2, hThread, TRUE, INFINITE);
+  cout << " finish driver StartIO call" << endl;
+#endif
 #if USE_IRP_PENDING
   ReadEx(hDevice);
 #else

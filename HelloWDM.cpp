@@ -10,9 +10,6 @@ extern "C"
 #include "Enum.h"
 
 
-#define PAGEDCODE code_seg("PAGE")
-#define LOCKEDDATA data_seg()
-#define INITDATA  data_seg("INIT")
 extern "C" NTSTATUS DriverEntry(
   IN PDRIVER_OBJECT DriverObject,
   IN PUNICODE_STRING
@@ -45,6 +42,7 @@ NTSTATUS DriverEntry(
   KdPrint(("Enter HelloWDM DriverEntry\n"));
   KdPrint(("Registry = %wZ\n", *RegistryEntry));
   DriverObject->DriverExtension->AddDevice = HelloWDMAddDevice;
+  DriverObject->DriverStartIo = HelloWDMStartIO;
   DriverObject->MajorFunction[IRP_MJ_PNP] = HelloWDMPnp;
   DriverObject->MajorFunction[IRP_MJ_CREATE] = HelloWDMDispatchRoutine;
   DriverObject->MajorFunction[IRP_MJ_CLOSE] = HelloWDMDispatchRoutine;

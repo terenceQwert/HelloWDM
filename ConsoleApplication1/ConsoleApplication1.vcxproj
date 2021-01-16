@@ -156,6 +156,7 @@
     <ClCompile Include="appFunction.cpp" />
     <ClCompile Include="appInOut.cpp" />
     <ClCompile Include="ConsoleApplication1.cpp" />
+    <ClCompile Include="Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="appFunction.h" />

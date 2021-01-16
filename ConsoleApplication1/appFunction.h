@@ -16,3 +16,5 @@ typedef struct _PCI_SLOT_NUMBER {
   } u;
 } PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
 //
+
+UINT WINAPI Thread(LPVOID context);

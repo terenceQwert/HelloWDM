@@ -69,12 +69,7 @@ NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 
 #pragma PAGEDCODE
 NTSTATUS HelloWDMRead(
-  IN PDEVICE_OBJECT 
-#if USE_IRP_PENDING 
-  ,
-#else
-  pDevObj,
-#endif 
+  IN PDEVICE_OBJECT pDevObj,
   IN PIRP pIrp)
 {
 
@@ -86,6 +81,10 @@ NTSTATUS HelloWDMRead(
   IoSetCancelRoutine(pIrp, CancelReadIrp);
   // pending this irp 
   IoMarkIrpPending(pIrp);
+#if DRIVER_START_IO
+  // put it to queue for StartIo Serial handling 
+  IoStartPacket(pDevObj, pIrp, 0, onCancelIrp);
+#endif
   KdPrint(("HelloWDMRead Exit\n"));
   return (Status = STATUS_PENDING);
 #else

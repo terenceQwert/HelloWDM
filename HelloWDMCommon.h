@@ -1,6 +1,14 @@
 #pragma once
 //#include <wdm.h>
 #include "HelloWdmIoControl.h"
+
+
+#define PAGEDCODE code_seg("PAGE")
+#define LOCKEDDATA data_seg()
+#define LOCKEDCODE code_seg()
+#define INITDATA  data_seg("INIT")
+
+
 typedef struct _MYData
 {
   ULONG data_1;
@@ -26,9 +34,12 @@ NTSTATUS HelloWDMWrite(PDEVICE_OBJECT pDevObj, PIRP pIrp);
 NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp);
 NTSTATUS HelloWDMDeviceIoControl(IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS DefaultPnpHandler(PDEVICE_EXTENSION pdx, PIRP Irp);
+VOID      HelloWDMStartIO(IN PDEVICE_OBJECT DeviceObject,IN PIRP Irp);
 
 NTSTATUS ForwardAndWait(PDEVICE_EXTENSION pdx, PIRP pIrp);
 VOID CancelReadIrp(IN PDEVICE_OBJECT DeviceObject, IN PIRP irp);
+VOID
+onCancelIrp(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp);
 
 NTSTATUS HandleStartDevice(PDEVICE_EXTENSION pdx, PIRP pIrp);
 NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP Irp);
