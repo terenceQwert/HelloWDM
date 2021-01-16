@@ -33,6 +33,13 @@ NTSTATUS HandleStartDevice(PDEVICE_EXTENSION pdx, PIRP pIrp);
 NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP Irp);
 NTSTATUS PnpQueryCapabilitiesHandler(IN PDEVICE_EXTENSION pdx, IN PIRP irp);
 
+NTSTATUS ReadWriteConfigSpace(
+  IN PDEVICE_OBJECT DeviceObj,
+  IN ULONG ReadOrWrite,
+  IN PVOID Buffer,
+  IN ULONG Offset,
+  IN ULONG Length
+);
 
 VOID ShowResources(IN PCM_PARTIAL_RESOURCE_LIST list);
 
