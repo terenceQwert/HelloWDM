@@ -173,6 +173,7 @@
     <ClCompile Include="DeviceCapability.cpp" />
     <ClCompile Include="DeviceIoControl.cpp" />
     <ClCompile Include="DeviceRemove.cpp" />
+    <ClCompile Include="DeviceSpaceConfig.cpp" />
     <ClCompile Include="DeviceStart.cpp" />
     <ClCompile Include="DirectIoMethod.cpp" />
     <ClCompile Include="DispatchRoutine.cpp" />
