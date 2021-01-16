@@ -7,6 +7,7 @@ extern "C"
 }
 #endif
 #include "HelloWDMCommon.h"
+#include "Feature_Flag.h"
 #pragma PAGEDCODE
 NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 {
@@ -67,11 +68,27 @@ NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 
 
 #pragma PAGEDCODE
-NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
+NTSTATUS HelloWDMRead(
+  IN PDEVICE_OBJECT 
+#if USE_IRP_PENDING 
+  ,
+#else
+  pDevObj,
+#endif 
+  IN PIRP pIrp)
 {
 
   KdPrint(("HelloWDMRead Entry\n"));
   NTSTATUS Status = STATUS_SUCCESS;
+ 
+  // acquire device extension
+#if USE_IRP_PENDING 
+  IoSetCancelRoutine(pIrp, CancelReadIrp);
+  // pending this irp 
+  IoMarkIrpPending(pIrp);
+  KdPrint(("HelloWDMRead Exit\n"));
+  return (Status = STATUS_PENDING);
+#else
   PDEVICE_EXTENSION pDevExt = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
   PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(pIrp);
   ULONG ulReaLength = stack->Parameters.Read.Length;
@@ -80,8 +97,10 @@ NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
 //  memset(pIrp->AssociatedIrp.SystemBuffer, 0xaa, ulReaLength);
   memcpy(pIrp->AssociatedIrp.SystemBuffer, pDevExt->buffer, ulReaLength);
   IoCompleteRequest(pIrp, IO_NO_INCREMENT);
+
   KdPrint(("HelloWDMRead Exit\n"));
   return Status;
+#endif
 }
 
 #pragma PAGEDCODE
