@@ -7,6 +7,7 @@ extern "C"
 }
 #endif
 #include "HelloWDMCommon.h"
+#include  "SimulateData.h"
 
 VOID 
 onCancelIrp(
@@ -49,6 +50,7 @@ HelloWDMStartIO(
 {
   KdPrint(("Enter HelloWDMStartIO\n"));
   KIRQL oldirql;
+  PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(pIrp);
   IoAcquireCancelSpinLock(&oldirql);
   if (pIrp != pDevObj->CurrentIrp || pIrp->Cancel)
   {
@@ -70,8 +72,16 @@ HelloWDMStartIO(
   // delay time 3 seconds to simulate IRP operation
   KeWaitForSingleObject(&event, Executive, KernelMode, FALSE, &timeout);
   // Set IRP Status
+  ULONG ulRead = stack->Parameters.Read.Length;
+
   pIrp->IoStatus.Status = STATUS_SUCCESS;
-  pIrp->IoStatus.Information = 0;
+  pIrp->IoStatus.Information = ulRead;
+  if( ulRead > strlen(DATA_ITEM))
+    memcpy(pIrp->AssociatedIrp.SystemBuffer, DATA_ITEM, strlen(DATA_ITEM));
+  else
+  {
+    strcpy((char*)pIrp->AssociatedIrp.SystemBuffer, "empty");
+  }
   // end of IRP request
   IoCompleteRequest(pIrp, IO_NO_INCREMENT);
   // read any irp from queue, and continue process by StartIO

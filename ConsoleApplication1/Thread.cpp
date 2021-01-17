@@ -10,6 +10,7 @@ UINT WINAPI Thread(LPVOID context)
   ULONG ulRead = 0;
   BOOL bRead = ReadFile(*(PHANDLE)context, buffer, 10, &ulRead, &overlap);
   WaitForSingleObject(overlap.hEvent, INFINITE);
+  printf("Thread %s\n", buffer);
   return 0;
 }
 

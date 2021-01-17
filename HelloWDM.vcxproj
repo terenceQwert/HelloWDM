@@ -177,6 +177,7 @@
     <ClCompile Include="DeviceCancelIrp.cpp" />
     <ClCompile Include="DeviceCapability.cpp" />
     <ClCompile Include="DeviceIoControl.cpp" />
+    <ClCompile Include="DeviceRead.cpp" />
     <ClCompile Include="DeviceRemove.cpp" />
     <ClCompile Include="DeviceSpaceConfig.cpp" />
     <ClCompile Include="DeviceStart.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="HelloWDMCommon.h" />
     <ClInclude Include="HelloWdmIoControl.h" />
     <ClInclude Include="PciCommon.h" />
+    <ClInclude Include="SimulateData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -187,7 +187,7 @@ int main()
   cout << " finish driver StartIO call" << endl;
 #endif
 #if USE_IRP_PENDING
-  ReadEx(hDevice);
+   ReadEx(hDevice);
 #else
   Read(hDevice);
   Write(hDevice);
