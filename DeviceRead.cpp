@@ -11,19 +11,17 @@ extern "C"
 #include  "SimulateData.h"
 #include "Feature_Flag.h"
 
-#pragma PAGEDCODE
-NTSTATUS HelloWDMRead(
-  IN PDEVICE_OBJECT pDevObj,
-  IN PIRP pIrp)
-{
 
-  KdPrint(("HelloWDMRead Entry\n"));
+VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj)
+{
   NTSTATUS Status = STATUS_SUCCESS;
-  UNICODE_STRING  DeviceName;
-  PDEVICE_EXTENSION pdx = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
   OBJECT_ATTRIBUTES objAttributes;
   IO_STATUS_BLOCK   statusBlock;
-
+  UNICODE_STRING  DeviceName;
+  PDEVICE_EXTENSION  pdx = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
+  LARGE_INTEGER offset;
+  PFILE_OBJECT file_object;
+  offset.QuadPart = 0;
   RtlInitUnicodeString(&DeviceName, L"\\Device\\00000020");
   // initialize objAttributes
   InitializeObjectAttributes(&objAttributes, &DeviceName, OBJ_CASE_INSENSITIVE, NULL, NULL);
@@ -33,13 +31,52 @@ NTSTATUS HelloWDMRead(
     &objAttributes,
     &statusBlock,
     NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ,
-    FILE_OPEN_IF, FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0);
+    FILE_OPEN_IF, 0, NULL, 0);
   // acquire device extension
   if (NT_SUCCESS(Status))
   {
-    KdPrint(("Read Entry -- Open another device success\n"));
+
+    KdPrint(("ReadEntry -- Open another device success\n"));
+    Status = ZwReadFile(pdx->hDevice, NULL, NULL, NULL, &statusBlock, NULL, 0,
+      &offset, NULL);
+    if( Status == STATUS_PENDING) {
+      KdPrint(("ReadEntry -- another return pending"));
+      Status = ObReferenceObjectByHandle(
+        pdx->hDevice, 
+        EVENT_MODIFY_STATE, 
+        *ExEventObjectType, 
+        KernelMode, 
+        (PVOID*)&file_object, 
+        NULL);
+      if (NT_SUCCESS(Status))
+      {
+        KdPrint(("Driver::Waiting\n"));
+        KeWaitForSingleObject(&file_object->Event, Executive, KernelMode, FALSE, NULL);
+        KdPrint(("antoher driver IRP ready \n"));
+        ObDereferenceObject(file_object);
+      }
+    } 
+    if (NT_SUCCESS(Status))
+    {
+      KdPrint(("ReadEntry -- read return success\n"));
+    }
+    else
+    {
+      KdPrint(("ReadEntry ErrorCode =%x", Status));
+    }
     ZwClose(pdx->hDevice);
   }
+}
+
+#pragma PAGEDCODE
+NTSTATUS HelloWDMRead(
+  IN PDEVICE_OBJECT pDevObj,
+  IN PIRP pIrp)
+{
+
+  KdPrint(("HelloWDMRead Entry\n"));
+  NTSTATUS Status = STATUS_SUCCESS;
+  DriverCallDriver(pDevObj);
 #if USE_IRP_PENDING 
   IoSetCancelRoutine(pIrp, CancelReadIrp);
   // pending this irp 

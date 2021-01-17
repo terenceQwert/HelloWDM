@@ -196,7 +196,7 @@ int main( int argc, char **argv)
 
 #if USE_IRP_PENDING
   ReadEx(hDevice);
-#else
+#else 
   Read(hDevice);
   Write(hDevice);
   Read(hDevice);
