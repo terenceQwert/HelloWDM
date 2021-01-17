@@ -19,8 +19,27 @@ NTSTATUS HelloWDMRead(
 
   KdPrint(("HelloWDMRead Entry\n"));
   NTSTATUS Status = STATUS_SUCCESS;
+  UNICODE_STRING  DeviceName;
+  PDEVICE_EXTENSION pdx = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
+  OBJECT_ATTRIBUTES objAttributes;
+  IO_STATUS_BLOCK   statusBlock;
 
+  RtlInitUnicodeString(&DeviceName, L"\\Device\\00000020");
+  // initialize objAttributes
+  InitializeObjectAttributes(&objAttributes, &DeviceName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  Status = ZwCreateFile(
+    &pdx->hDevice,
+    FILE_READ_ATTRIBUTES | SYNCHRONIZE,
+    &objAttributes,
+    &statusBlock,
+    NULL, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ,
+    FILE_OPEN_IF, FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0);
   // acquire device extension
+  if (NT_SUCCESS(Status))
+  {
+    KdPrint(("Read Entry -- Open another device success\n"));
+    ZwClose(pdx->hDevice);
+  }
 #if USE_IRP_PENDING 
   IoSetCancelRoutine(pIrp, CancelReadIrp);
   // pending this irp 

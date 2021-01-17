@@ -30,11 +30,13 @@ typedef struct _DEVICE_EXTENSION
   LARGE_INTEGER   pollingInterval;
   KTIMER         pollingTimer;
   KDPC           pollingDPC;
+  HANDLE          hDevice;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 #define arraysize(p)  (sizeof(p)/sizeof((p)[0]))
 
 NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT fdo, IN PIRP Irp);
+NTSTATUS DeviceClose(IN PDEVICE_OBJECT fdo, IN PIRP Irp);
 NTSTATUS HelloWDMWrite(PDEVICE_OBJECT pDevObj, PIRP pIrp);
 NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp);
 NTSTATUS HelloWDMDeviceIoControl(IN PDEVICE_OBJECT, IN PIRP);

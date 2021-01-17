@@ -45,7 +45,7 @@ NTSTATUS DriverEntry(
   DriverObject->DriverStartIo = HelloWDMStartIO;
   DriverObject->MajorFunction[IRP_MJ_PNP] = HelloWDMPnp;
   DriverObject->MajorFunction[IRP_MJ_CREATE] = HelloWDMDispatchRoutine;
-  DriverObject->MajorFunction[IRP_MJ_CLOSE] = HelloWDMDispatchRoutine;
+  DriverObject->MajorFunction[IRP_MJ_CLOSE] = DeviceClose;
 #if BUFFER_IO
   DriverObject->MajorFunction[IRP_MJ_READ] = HelloWDMRead;
 #else

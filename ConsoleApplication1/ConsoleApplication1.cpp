@@ -193,6 +193,15 @@ int main( int argc, char **argv)
 #else
   hDevice = GetDeviceViaInterfaces(&MyWDMDevice, 0);
 #endif
+
+#if USE_IRP_PENDING
+  ReadEx(hDevice);
+#else
+  Read(hDevice);
+  Write(hDevice);
+  Read(hDevice);
+#endif
+
   timer_function(argc, argv, hDevice);
   DisplayPCIConfiguration(hDevice, 2, 0, 0);
   IOCTL(hDevice);
@@ -204,13 +213,7 @@ int main( int argc, char **argv)
   WaitForMultipleObjects(2, hThread, TRUE, INFINITE);
   cout << " finish driver StartIO call" << endl;
 #endif
-#if USE_IRP_PENDING
-   ReadEx(hDevice);
-#else
-  Read(hDevice);
-  Write(hDevice);
-  Read(hDevice);
-#endif
+
 
   CloseHandle(hDevice);
   std::cout << "Hello World!\n";

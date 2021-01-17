@@ -176,6 +176,7 @@
   <ItemGroup>
     <ClCompile Include="DeviceCancelIrp.cpp" />
     <ClCompile Include="DeviceCapability.cpp" />
+    <ClCompile Include="DeviceClose.cpp" />
     <ClCompile Include="DeviceIoControl.cpp" />
     <ClCompile Include="DeviceIoControl_Timer.cpp" />
     <ClCompile Include="DeviceQueryRelation.cpp" />
