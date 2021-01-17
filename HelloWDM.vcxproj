@@ -184,6 +184,7 @@
     <ClCompile Include="DeviceSpaceConfig.cpp" />
     <ClCompile Include="DeviceStart.cpp" />
     <ClCompile Include="DeviceStartIO.cpp" />
+    <ClCompile Include="DeviceTimerDPC.cpp" />
     <ClCompile Include="DirectIoMethod.cpp" />
     <ClCompile Include="DispatchRoutine.cpp" />
     <ClCompile Include="Enum.cpp" />

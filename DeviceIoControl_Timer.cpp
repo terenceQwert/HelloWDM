@@ -35,7 +35,7 @@ VOID OnTimer(
 
 VOID Start_Timer_Function(
   IN PDEVICE_OBJECT pDevObj,
-  IN PIRP           /* pIrp */
+  IN PIRP           pIrp
 )
 {
   KdPrint(("IOCTL_START_TIMEOUT\n"));
@@ -45,8 +45,20 @@ VOID Start_Timer_Function(
   ULONG cbOut = stack->Parameters.DeviceIoControl.OutputBufferLength;
 #endif
   PDEVICE_EXTENSION pDevExt = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
+  ULONG ulMicroSeconds = *(ULONG*)pIrp->AssociatedIrp.SystemBuffer;
+  KdPrint(("Configure ulMicroSeconds value = %d\n", ulMicroSeconds));
+#if 0
   pDevExt->lTimerCount = TIMER_OUT;
   IoStartTimer(pDevObj);
+#else
+//  pDevExt->pollingInterval.QuadPart = -10 * ulMicroSeconds;
+  pDevExt->pollingInterval.QuadPart = -10 * 3 * 1000 * 1000;
+  KeSetTimer(
+    &pDevExt->pollingTimer,
+    pDevExt->pollingInterval,
+    &pDevExt->pollingDPC
+  );
+#endif
 }
 
 
@@ -56,5 +68,10 @@ VOID Stop_Timer_Function(
 )
 {
   KdPrint(("IOCTL_STOP_TIMEOUT\n"));
+#if 0
   IoStopTimer(pDevObj);
+#else
+  PDEVICE_EXTENSION pdx = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
+  KeCancelTimer(&pdx->pollingTimer);
+#endif
 }

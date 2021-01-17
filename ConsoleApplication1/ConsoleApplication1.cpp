@@ -160,6 +160,22 @@ void DisplayPCIConfiguration(HANDLE hDevice, int bus, int dev, int fun)
   printf("InterruptPin:%d\n", pci_configuration.u.type0.InterruptPin);
 }
 
+void timer_function(int argc, char **argv, HANDLE hDevice)
+{
+  if (argc > 1)
+  {
+    string str = argv[1];
+    if (str == "timer")
+    {
+      str = argv[2];
+      if (str == "start") {
+        ExecuteTimerStartControl(hDevice, 3*1000*1000);
+        }
+      else
+        ExecuteTimerStopControl(hDevice);
+    }
+  }
+}
 
 int main( int argc, char **argv)
 {
@@ -177,6 +193,7 @@ int main( int argc, char **argv)
 #else
   hDevice = GetDeviceViaInterfaces(&MyWDMDevice, 0);
 #endif
+  timer_function(argc, argv, hDevice);
   DisplayPCIConfiguration(hDevice, 2, 0, 0);
   IOCTL(hDevice);
 #if DRIVER_START_IO
@@ -194,18 +211,7 @@ int main( int argc, char **argv)
   Write(hDevice);
   Read(hDevice);
 #endif
-  if( argc > 1)
-  {
-    string str = argv[1];
-    if (str == "timer")
-    {
-      str = argv[2];
-      if (str == "start")
-        ExecuteTimerStartControl(hDevice);
-      else
-        ExecuteTimerStopControl(hDevice);
-    }
-  } 
+
   CloseHandle(hDevice);
   std::cout << "Hello World!\n";
 }

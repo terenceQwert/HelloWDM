@@ -143,7 +143,12 @@ NTSTATUS HelloWDMAddDevice(
   fdo->Flags |= DO_DIRECT_IO;
 #endif
   fdo->Flags &= ~DO_DEVICE_INITIALIZING;
+#if 0
   IoInitializeTimer(fdo, OnTimer, NULL);
+#else
+  KeInitializeTimer(&pdx->pollingTimer);
+  KeInitializeDpc(&pdx->pollingDPC, PollingTimerDpc, (PVOID)fdo);
+#endif
   KdPrint(("Leave HelloWDMAddDevice\n"));
   DumpDeviceStack(PhysicalDeviceObject);
 //  DisplayProcessName();

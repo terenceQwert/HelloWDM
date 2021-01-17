@@ -4,15 +4,15 @@
 using namespace std;
 
 
-VOID ExecuteTimerStartControl( HANDLE pDevHandle)
+VOID ExecuteTimerStartControl( HANDLE pDevHandle, ULONG timeInterval)
 {
-  ULONG cbin = sizeof(GUID);
+  ULONG cbin = sizeof(int);
   UCHAR *InputBuffer = new UCHAR[sizeof(GUID)];
   ULONG cbout = sizeof(GUID);
   UCHAR *OutputBuffer = new UCHAR[sizeof(GUID)];
   DWORD bBytesReturn = 0;
 
-  memset(InputBuffer, 0xEE, sizeof(GUID));
+  memcpy(InputBuffer, &timeInterval, sizeof(int));
   memset(OutputBuffer, 0, sizeof(GUID));
 
   BOOL bResult = DeviceIoControl(

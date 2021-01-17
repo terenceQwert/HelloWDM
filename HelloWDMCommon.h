@@ -27,6 +27,7 @@ typedef struct _DEVICE_EXTENSION
   UNICODE_STRING interfaceName;
   LONG            lTimerCount;
   PIRP            currentPendingIrp;
+  LARGE_INTEGER   pollingInterval;
   KTIMER         pollingTimer;
   KDPC           pollingDPC;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
@@ -53,6 +54,15 @@ VOID OnTimer(
   IN PDEVICE_OBJECT pDevObj,
   IN PVOID      /* Context */
 );
+
+VOID PollingTimerDpc(
+  IN PKDPC pDpc,
+  IN PVOID pContext,
+  IN PVOID SysArg1,
+  IN PVOID SysArg2
+);
+
+
 /// test method
 VOID Start_Timer_Function(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp);
 VOID Stop_Timer_Function(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp);
