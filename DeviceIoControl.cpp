@@ -153,6 +153,12 @@ NTSTATUS HelloWDMDeviceIoControl(
       KdPrint(("InterruptPin:%d\n", pci_config.u.type0.InterruptPin));
     }
     break;
+  case START_TIMER:
+    Start_Timer_Function( pDevObj, pIrp);
+    break;
+  case STOP_TIMER:
+    Stop_Timer_Function( pDevObj, pIrp);
+    break;
   default:
     status = STATUS_INVALID_VARIANT;
     break;

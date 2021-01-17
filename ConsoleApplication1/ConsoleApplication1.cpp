@@ -6,6 +6,7 @@
 #include <SetupAPI.h>
 #include <winioctl.h>
 #include <process.h>
+#include <string>
 #include "appFunction.h"
 #include "../HelloWdmIoControl.h"
 #include "../PciCommon.h"
@@ -97,7 +98,7 @@ void Write(HANDLE devHandler)
   }
 #endif
 }
-#pragma PAGEDCODE
+
 void IOCTL( HANDLE devHandle)
 {
   ULONG cbin = sizeof(GUID);
@@ -160,7 +161,7 @@ void DisplayPCIConfiguration(HANDLE hDevice, int bus, int dev, int fun)
 }
 
 
-int main()
+int main( int argc, char **argv)
 {
   HANDLE hDevice = NULL;
 #if USE_NAME
@@ -193,6 +194,18 @@ int main()
   Write(hDevice);
   Read(hDevice);
 #endif
+  if( argc > 1)
+  {
+    string str = argv[1];
+    if (str == "timer")
+    {
+      str = argv[2];
+      if (str == "start")
+        ExecuteTimerStartControl(hDevice);
+      else
+        ExecuteTimerStopControl(hDevice);
+    }
+  } 
   CloseHandle(hDevice);
   std::cout << "Hello World!\n";
 }

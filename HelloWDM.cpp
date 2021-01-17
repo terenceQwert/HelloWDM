@@ -8,7 +8,7 @@ extern "C"
 #endif
 #include "HelloWDMCommon.h"
 #include "Enum.h"
-
+#include "Feature_Flag.h"
 
 extern "C" NTSTATUS DriverEntry(
   IN PDRIVER_OBJECT DriverObject,
@@ -143,6 +143,7 @@ NTSTATUS HelloWDMAddDevice(
   fdo->Flags |= DO_DIRECT_IO;
 #endif
   fdo->Flags &= ~DO_DEVICE_INITIALIZING;
+  IoInitializeTimer(fdo, OnTimer, NULL);
   KdPrint(("Leave HelloWDMAddDevice\n"));
   DumpDeviceStack(PhysicalDeviceObject);
 //  DisplayProcessName();

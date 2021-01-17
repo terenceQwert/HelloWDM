@@ -18,3 +18,6 @@ typedef struct _PCI_SLOT_NUMBER {
 //
 
 UINT WINAPI Thread(LPVOID context);
+
+VOID ExecuteTimerStartControl(HANDLE);
+VOID ExecuteTimerStopControl(HANDLE);

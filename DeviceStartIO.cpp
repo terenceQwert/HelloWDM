@@ -90,37 +90,3 @@ HelloWDMStartIO(
  
 }
 
-
-/// below two funcxitons are defined in wdm.h already.
-#if 0
-VOID 
-IoStartPacket(PDEVICE_OBJECT device, PIRP Irp, PULONG , PDRIVER_CANCEL cancel)
-
-{
-  KIRQL oldirql;
-  // acquire lock
-  IoAcquireCancelSpinLock(&oldirql);
-  // configure cancel function
-  IoSetCancelRoutine(Irp, cancel);
-  device->CurrentIrp = Irp;
-  IoReleaseCancelSpinLock(oldirql);
-  device->DriverObject->DriverStartIo(device, Irp);
-}
-
-
-VOID IoStartNextPacket(PDEVICE_OBJECT device, BOOLEAN cancel)
-{
-  KIRQL oldirql;
-  if (cancel)
-  {
-    IoAcquireCancelSpinLock(&oldirql);
-  }
-  PKDEVICE_QUEUE_ENTRY p = KeRemoveDeviceQueue(&device->DeviceQueue);
-  PIRP Irp = CONTAINING_RECORD(p, IRP, Tail.Overlay.DeviceQueueEntry);
-  // set Irp
-  device->CurrentIrp = Irp;
-  if (cancel)
-    IoReleaseCancelSpinLock(oldirql);
-  device->DriverObject->DriverStartIo(device, Irp);
-}
-#endif

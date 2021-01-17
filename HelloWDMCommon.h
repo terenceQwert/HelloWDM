@@ -25,6 +25,10 @@ typedef struct _DEVICE_EXTENSION
   UCHAR           buffer[MAXIMUM_FILENAME_LENGTH];
   ULONG           file_length;
   UNICODE_STRING interfaceName;
+  LONG            lTimerCount;
+  PIRP            currentPendingIrp;
+  KTIMER         pollingTimer;
+  KDPC           pollingDPC;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 #define arraysize(p)  (sizeof(p)/sizeof((p)[0]))
@@ -44,6 +48,15 @@ onCancelIrp(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp);
 NTSTATUS HandleStartDevice(PDEVICE_EXTENSION pdx, PIRP pIrp);
 NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP Irp);
 NTSTATUS PnpQueryCapabilitiesHandler(IN PDEVICE_EXTENSION pdx, IN PIRP irp);
+
+VOID OnTimer(
+  IN PDEVICE_OBJECT pDevObj,
+  IN PVOID      /* Context */
+);
+/// test method
+VOID Start_Timer_Function(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp);
+VOID Stop_Timer_Function(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp);
+
 
 NTSTATUS ReadWriteConfigSpace(
   IN PDEVICE_OBJECT DeviceObj,
