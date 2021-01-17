@@ -49,6 +49,7 @@ onCancelIrp(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp);
 NTSTATUS HandleStartDevice(PDEVICE_EXTENSION pdx, PIRP pIrp);
 NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP Irp);
 NTSTATUS PnpQueryCapabilitiesHandler(IN PDEVICE_EXTENSION pdx, IN PIRP irp);
+NTSTATUS DeviceQueryDeviceRelation(PDEVICE_EXTENSION pdx, PIRP /* pIrp */);
 
 VOID OnTimer(
   IN PDEVICE_OBJECT pDevObj,

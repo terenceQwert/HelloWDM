@@ -178,6 +178,7 @@
     <ClCompile Include="DeviceCapability.cpp" />
     <ClCompile Include="DeviceIoControl.cpp" />
     <ClCompile Include="DeviceIoControl_Timer.cpp" />
+    <ClCompile Include="DeviceQueryRelation.cpp" />
     <ClCompile Include="DeviceRead.cpp" />
     <ClCompile Include="DeviceRead_Timer.cpp" />
     <ClCompile Include="DeviceRemove.cpp" />

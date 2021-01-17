@@ -167,6 +167,8 @@ NTSTATUS DefaultPnpHandler(PDEVICE_EXTENSION pdx, PIRP Irp)
   return IoCallDriver(pdx->NextStackDevice, Irp);
 }
 
+
+
 #if USE_NAME
 #pragma
 NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP pIrp)
@@ -255,7 +257,7 @@ NTSTATUS HelloWDMPnp(IN PDEVICE_OBJECT fdo, IN PIRP Irp)
     DefaultPnpHandler,  // IRP_MN_STOP_DEVICE
     DefaultPnpHandler,  // IRP_MN_QUERY_STOP_DEVICE
     DefaultPnpHandler,  // IRP_MN_CANCEL_STOP_DEVICE
-    DefaultPnpHandler,  // IRP_MN_QUERY_DEVICE_RELATIONS
+    DeviceQueryDeviceRelation,  // IRP_MN_QUERY_DEVICE_RELATIONS
     DefaultPnpHandler,  // IRP_MN_QUERY_INTERFACE
     PnpQueryCapabilitiesHandler,  // IRP_MN_QUERY_CAPABILITIES
     DefaultPnpHandler,
