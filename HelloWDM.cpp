@@ -8,11 +8,8 @@ extern "C"
 #endif
 #include "HelloWDMCommon.h"
 #include "Enum.h"
+#include "Feature_Flag.h"
 
-
-#define PAGEDCODE code_seg("PAGE")
-#define LOCKEDDATA data_seg()
-#define INITDATA  data_seg("INIT")
 extern "C" NTSTATUS DriverEntry(
   IN PDRIVER_OBJECT DriverObject,
   IN PUNICODE_STRING
@@ -45,9 +42,10 @@ NTSTATUS DriverEntry(
   KdPrint(("Enter HelloWDM DriverEntry\n"));
   KdPrint(("Registry = %wZ\n", *RegistryEntry));
   DriverObject->DriverExtension->AddDevice = HelloWDMAddDevice;
+  DriverObject->DriverStartIo = HelloWDMStartIO;
   DriverObject->MajorFunction[IRP_MJ_PNP] = HelloWDMPnp;
   DriverObject->MajorFunction[IRP_MJ_CREATE] = HelloWDMDispatchRoutine;
-  DriverObject->MajorFunction[IRP_MJ_CLOSE] = HelloWDMDispatchRoutine;
+  DriverObject->MajorFunction[IRP_MJ_CLOSE] = DeviceClose;
 #if BUFFER_IO
   DriverObject->MajorFunction[IRP_MJ_READ] = HelloWDMRead;
 #else
@@ -145,6 +143,12 @@ NTSTATUS HelloWDMAddDevice(
   fdo->Flags |= DO_DIRECT_IO;
 #endif
   fdo->Flags &= ~DO_DEVICE_INITIALIZING;
+#if 0
+  IoInitializeTimer(fdo, OnTimer, NULL);
+#else
+  KeInitializeTimer(&pdx->pollingTimer);
+  KeInitializeDpc(&pdx->pollingDPC, PollingTimerDpc, (PVOID)fdo);
+#endif
   KdPrint(("Leave HelloWDMAddDevice\n"));
   DumpDeviceStack(PhysicalDeviceObject);
 //  DisplayProcessName();
@@ -162,6 +166,8 @@ NTSTATUS DefaultPnpHandler(PDEVICE_EXTENSION pdx, PIRP Irp)
   KdPrint(("Leave DefaultHandler\n"));
   return IoCallDriver(pdx->NextStackDevice, Irp);
 }
+
+
 
 #if USE_NAME
 #pragma
@@ -251,7 +257,7 @@ NTSTATUS HelloWDMPnp(IN PDEVICE_OBJECT fdo, IN PIRP Irp)
     DefaultPnpHandler,  // IRP_MN_STOP_DEVICE
     DefaultPnpHandler,  // IRP_MN_QUERY_STOP_DEVICE
     DefaultPnpHandler,  // IRP_MN_CANCEL_STOP_DEVICE
-    DefaultPnpHandler,  // IRP_MN_QUERY_DEVICE_RELATIONS
+    DeviceQueryDeviceRelation,  // IRP_MN_QUERY_DEVICE_RELATIONS
     DefaultPnpHandler,  // IRP_MN_QUERY_INTERFACE
     PnpQueryCapabilitiesHandler,  // IRP_MN_QUERY_CAPABILITIES
     DefaultPnpHandler,

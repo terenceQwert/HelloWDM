@@ -5,8 +5,12 @@
 #include <Windows.h>
 #include <SetupAPI.h>
 #include <winioctl.h>
+#include <process.h>
+#include <string>
+#include "appFunction.h"
 #include "../HelloWdmIoControl.h"
 #include "../PciCommon.h"
+#include "../Feature_Flag.h"
 #if 0
 void _cdecl operator delete (void *pointer)
 {
@@ -15,16 +19,7 @@ void _cdecl operator delete (void *pointer)
   pointer = NULL;
 }
 #endif
-typedef struct _PCI_SLOT_NUMBER {
-  union {
-    struct {
-      ULONG   DeviceNumber : 5;
-      ULONG   FunctionNumber : 3;
-      ULONG   Reserved : 24;
-    } bits;
-    ULONG   AsULONG;
-  } u;
-} PCI_SLOT_NUMBER, *PPCI_SLOT_NUMBER;
+
 
 
 using namespace std;
@@ -50,7 +45,44 @@ void Read( HANDLE devHandler)
     }
     printf("\n");
   }
+  else
+  {
+    printf("GetLastError() = %d\n", GetLastError());
+  }
 
+}
+
+VOID ReadEx(HANDLE devHandler)
+{
+  UCHAR *buffer = new UCHAR[WRITE_LENGTH];
+  memset(buffer, 0, WRITE_LENGTH);
+  ULONG ulRead = 0;
+  OVERLAPPED ov1 = { 0 };
+  OVERLAPPED ov2 = { 0 };
+
+  BOOL bResult = ReadFile(devHandler, buffer, WRITE_LENGTH, &ulRead, &ov1);
+  if (bResult)
+  {
+    printf("Read %d bytes", ulRead);
+    for (ULONG i = 0; i < ulRead; i++)
+    {
+      printf("0x%02x ", buffer[i]);
+    }
+    printf("\n");
+  }
+  else if ( !bResult && GetLastError() == ERROR_IO_PENDING)
+  {
+    printf("The operation is pending \n");
+  }
+  else
+  {
+    printf("GetLastError() = %d\n", GetLastError());
+  }
+
+  Sleep(2000);
+  CancelIo(devHandler);
+  
+  delete[] buffer;
 }
 
 void Write(HANDLE devHandler)
@@ -66,7 +98,7 @@ void Write(HANDLE devHandler)
   }
 #endif
 }
-#pragma PAGEDCODE
+
 void IOCTL( HANDLE devHandle)
 {
   ULONG cbin = sizeof(GUID);
@@ -90,24 +122,7 @@ void IOCTL( HANDLE devHandle)
   );
 }
 
-DWORD In_32(HANDLE hDevice, USHORT port)
-{
-  DWORD dwOutput;
-  DWORD inputBuffer[2] = {
-    port,
-    4
-  };
-  DWORD dwResult;
-  DeviceIoControl(hDevice, READ_PORT, inputBuffer, sizeof(inputBuffer), &dwResult, sizeof(DWORD), &dwOutput, NULL);
-  return dwResult;
-}
 
-void Out_32(HANDLE hDevice, USHORT port, DWORD value)
-{
-  DWORD  dwOutput;
-  DWORD inputBuffer[3] = { port, 4, value };
-  DeviceIoControl(hDevice, WRITE_PORT, inputBuffer, sizeof(inputBuffer), NULL, 0, &dwOutput, NULL);
-}
 void DisplayPCIConfiguration(HANDLE hDevice, int bus, int dev, int fun)
 {
   DWORD dwAdddr;
@@ -145,55 +160,24 @@ void DisplayPCIConfiguration(HANDLE hDevice, int bus, int dev, int fun)
   printf("InterruptPin:%d\n", pci_configuration.u.type0.InterruptPin);
 }
 
-HANDLE GetDeviceViaInterfaces(GUID * pGuid, DWORD instances)
+void timer_function(int argc, char **argv, HANDLE hDevice)
 {
-  HDEVINFO info = SetupDiGetClassDevs(pGuid, NULL, NULL, DIGCF_PRESENT | DIGCF_INTERFACEDEVICE);
-  if (info == INVALID_HANDLE_VALUE)
+  if (argc > 1)
   {
-    printf("No HDEVINFO available for this GUID\n");
-    return NULL;
+    string str = argv[1];
+    if (str == "timer")
+    {
+      str = argv[2];
+      if (str == "start") {
+        ExecuteTimerStartControl(hDevice, 3*1000*1000);
+        }
+      else
+        ExecuteTimerStopControl(hDevice);
+    }
   }
-
-  SP_INTERFACE_DEVICE_DATA ifData;
-  ifData.cbSize = sizeof(ifData);
-  if (!SetupDiEnumDeviceInterfaces(info, NULL, pGuid, instances, &ifData))
-  {
-    printf("No SP_INTERFACE_DEVICE_DATA available for this GUID interface\n");
-    SetupDiDestroyDeviceInfoList(info);
-    return NULL;
-  }
-  DWORD RegLen;
-  SetupDiGetDeviceInterfaceDetail(info, &ifData, NULL, 0, &RegLen, NULL);
-  PSP_INTERFACE_DEVICE_DETAIL_DATA ifDetail = (PSP_INTERFACE_DEVICE_DETAIL_DATA) new TCHAR[RegLen];
-  if (ifDetail == NULL)
-  {
-    SetupDiDestroyDeviceInfoList(info);
-    return NULL;
-  }
-  // Get two symoblic link
-  ifDetail->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA);
-  if (!SetupDiGetDeviceInterfaceDetail(info, &ifData, ifDetail, RegLen, NULL, NULL))
-  {
-    SetupDiDestroyDeviceInfoList(info);
-    delete ifDetail;
-    return NULL;
-  }
-  printf("Symbolic link is %ws\n", ifDetail->DevicePath);
-  HANDLE rv = CreateFile(ifDetail->DevicePath,
-    GENERIC_READ | GENERIC_WRITE,
-    FILE_SHARE_READ | FILE_SHARE_WRITE,
-    NULL,
-    OPEN_EXISTING,
-    FILE_ATTRIBUTE_NORMAL,
-    NULL);
-  if (rv == INVALID_HANDLE_VALUE)
-    rv = NULL;
-  delete ifDetail;
-  SetupDiDestroyDeviceInfoList(info);
-  return rv;
 }
 
-int main()
+int main( int argc, char **argv)
 {
   HANDLE hDevice = NULL;
 #if USE_NAME
@@ -209,13 +193,28 @@ int main()
 #else
   hDevice = GetDeviceViaInterfaces(&MyWDMDevice, 0);
 #endif
-  DisplayPCIConfiguration(hDevice, 2, 0, 0);
-  IOCTL(hDevice);
-#if 0
+
+#if USE_IRP_PENDING
+  ReadEx(hDevice);
+#else 
   Read(hDevice);
   Write(hDevice);
   Read(hDevice);
 #endif
+
+  timer_function(argc, argv, hDevice);
+  DisplayPCIConfiguration(hDevice, 2, 0, 0);
+  IOCTL(hDevice);
+#if DRIVER_START_IO
+  HANDLE hThread[2];
+  hThread[0] = (HANDLE)_beginthreadex(NULL, 0, Thread, &hDevice, 0, NULL);
+  hThread[1] = (HANDLE)_beginthreadex(NULL, 0, Thread, &hDevice, 0, NULL);
+
+  WaitForMultipleObjects(2, hThread, TRUE, INFINITE);
+  cout << " finish driver StartIO call" << endl;
+#endif
+
+
   CloseHandle(hDevice);
   std::cout << "Hello World!\n";
 }

@@ -7,6 +7,7 @@ extern "C"
 }
 #endif
 #include "HelloWDMCommon.h"
+#include "Feature_Flag.h"
 #pragma PAGEDCODE
 NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 {
@@ -66,23 +67,6 @@ NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 }
 
 
-#pragma PAGEDCODE
-NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
-{
-
-  KdPrint(("HelloWDMRead Entry\n"));
-  NTSTATUS Status = STATUS_SUCCESS;
-  PDEVICE_EXTENSION pDevExt = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
-  PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(pIrp);
-  ULONG ulReaLength = stack->Parameters.Read.Length;
-  pIrp->IoStatus.Status = Status;
-  pIrp->IoStatus.Information = ulReaLength;
-//  memset(pIrp->AssociatedIrp.SystemBuffer, 0xaa, ulReaLength);
-  memcpy(pIrp->AssociatedIrp.SystemBuffer, pDevExt->buffer, ulReaLength);
-  IoCompleteRequest(pIrp, IO_NO_INCREMENT);
-  KdPrint(("HelloWDMRead Exit\n"));
-  return Status;
-}
 
 #pragma PAGEDCODE
 NTSTATUS

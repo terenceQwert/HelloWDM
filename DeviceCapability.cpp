@@ -46,3 +46,4 @@ PnpQueryCapabilitiesHandler(IN PDEVICE_EXTENSION pdx, IN PIRP irp)
   IoCompleteRequest(irp, IO_NO_INCREMENT);
   return status;
 }
+

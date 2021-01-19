@@ -40,7 +40,7 @@ VOID EnumeratePCI()
 
 #pragma PAGEDCODE
 NTSTATUS HelloWDMDeviceIoControl(
-  IN PDEVICE_OBJECT /* pDevObj */,
+  IN PDEVICE_OBJECT pDevObj,
   IN PIRP pIrp
 )
 {
@@ -128,8 +128,36 @@ NTSTATUS HelloWDMDeviceIoControl(
     }
     info = 0;
     break;
-  case Enum_PCI:
-
+  case PCI_CONFIG:
+    PCI_COMMON_CONFIG pci_config;
+    status = ReadWriteConfigSpace(pDevObj, 0, &pci_config, 0, sizeof(PCI_COMMON_CONFIG));
+    if (NT_SUCCESS(status))
+    {
+      KdPrint(("VendorID:%x\n", pci_config.VendorID));
+      KdPrint(("DeviceID:%x\n", pci_config.DeviceID));
+      KdPrint(("Command:%x\n", pci_config.Command));
+      KdPrint(("Status:%x\n", pci_config.Status));
+      KdPrint(("RevisionID:%x\n", pci_config.RevisionID));
+      KdPrint(("ProgIf:%x\n", pci_config.ProgIf));
+      KdPrint(("SubClass:%x\n", pci_config.SubClass));
+      KdPrint(("BaseClass:%x\n", pci_config.BaseClass));
+      KdPrint(("CacheLineSize:%x\n", pci_config.CacheLineSize));
+      KdPrint(("LatencyTimer:%x\n", pci_config.LatencyTimer));
+      KdPrint(("HeaderType:%x\n", pci_config.HeaderType));
+      KdPrint(("BIST:%x\n", pci_config.BIST));
+      for (int i = 0; i < 6; i++)
+      {
+        KdPrint(("BaseAddresses[%d]:0X%08X\n", i, pci_config.u.type0.BaseAddresses[i]));
+      }
+      KdPrint(("InterruptLine:%d\n", pci_config.u.type0.InterruptLine));
+      KdPrint(("InterruptPin:%d\n", pci_config.u.type0.InterruptPin));
+    }
+    break;
+  case START_TIMER:
+    Start_Timer_Function( pDevObj, pIrp);
+    break;
+  case STOP_TIMER:
+    Stop_Timer_Function( pDevObj, pIrp);
     break;
   default:
     status = STATUS_INVALID_VARIANT;
