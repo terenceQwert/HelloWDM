@@ -17,6 +17,7 @@ typedef struct _DEVICE_EXTENSION
   UCHAR           buffer[MAXIMUM_FILENAME_LENGTH];
   ULONG           file_length;
   UNICODE_STRING interfaceName;
+  PDEVICE_OBJECT LowerDevice;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 #define arraysize(p)  (sizeof(p)/sizeof((p)[0]))

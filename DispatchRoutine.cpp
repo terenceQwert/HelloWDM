@@ -73,6 +73,7 @@ NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
   KdPrint(("HelloWDMRead Entry\n"));
   NTSTATUS Status = STATUS_SUCCESS;
   PDEVICE_EXTENSION pDevExt = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
+#if 0
   PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(pIrp);
   ULONG ulReaLength = stack->Parameters.Read.Length;
   pIrp->IoStatus.Status = Status;
@@ -80,6 +81,10 @@ NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
 //  memset(pIrp->AssociatedIrp.SystemBuffer, 0xaa, ulReaLength);
   memcpy(pIrp->AssociatedIrp.SystemBuffer, pDevExt->buffer, ulReaLength);
   IoCompleteRequest(pIrp, IO_NO_INCREMENT);
+#else
+  IoSkipCurrentIrpStackLocation(pIrp);
+  Status = IoCallDriver(pDevExt->LowerDevice, pIrp);
+#endif
   KdPrint(("HelloWDMRead Exit\n"));
   return Status;
 }
