@@ -42,7 +42,7 @@
     <Configuration>Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
     <RootNamespace>HelloWDM</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -51,6 +51,7 @@
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>WDM</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -65,6 +66,7 @@
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>WDM</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -94,6 +96,7 @@
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>WDM</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -171,10 +174,19 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DeviceCancelIrp.cpp" />
     <ClCompile Include="DeviceCapability.cpp" />
+    <ClCompile Include="DeviceClose.cpp" />
     <ClCompile Include="DeviceIoControl.cpp" />
+    <ClCompile Include="DeviceIoControl_Timer.cpp" />
+    <ClCompile Include="DeviceQueryRelation.cpp" />
+    <ClCompile Include="DeviceRead.cpp" />
+    <ClCompile Include="DeviceRead_Timer.cpp" />
     <ClCompile Include="DeviceRemove.cpp" />
+    <ClCompile Include="DeviceSpaceConfig.cpp" />
     <ClCompile Include="DeviceStart.cpp" />
+    <ClCompile Include="DeviceStartIO.cpp" />
+    <ClCompile Include="DeviceTimerDPC.cpp" />
     <ClCompile Include="DirectIoMethod.cpp" />
     <ClCompile Include="DispatchRoutine.cpp" />
     <ClCompile Include="Enum.cpp" />
@@ -186,9 +198,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enum.h" />
+    <ClInclude Include="Feature_Flag.h" />
     <ClInclude Include="HelloWDMCommon.h" />
     <ClInclude Include="HelloWdmIoControl.h" />
     <ClInclude Include="PciCommon.h" />
+    <ClInclude Include="SimulateData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

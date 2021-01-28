@@ -7,6 +7,7 @@ extern "C"
 }
 #endif
 #include "HelloWDMCommon.h"
+#include "Feature_Flag.h"
 #pragma PAGEDCODE
 NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
 {
