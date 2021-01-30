@@ -68,6 +68,7 @@ VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj)
   }
 }
 
+#if KEYBAORD_FILTER
 #pragma PAGEDCODE
 NTSTATUS HelloWDMRead(
   IN PDEVICE_OBJECT pDevObj,
@@ -102,3 +103,4 @@ NTSTATUS HelloWDMRead(
 #endif
 }
 
+#endif

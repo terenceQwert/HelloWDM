@@ -66,7 +66,7 @@ NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
   return status;
 }
 
-
+#if !KEYBAORD_FILTER
 #pragma PAGEDCODE
 NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
 {
@@ -89,6 +89,8 @@ NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
   KdPrint(("HelloWDMRead Exit\n"));
   return Status;
 }
+
+#endif
 
 #pragma PAGEDCODE
 NTSTATUS

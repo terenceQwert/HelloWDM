@@ -5,3 +5,4 @@
 #define BUFFER_IO 1
 #define TIMER_OUT	3
 
+#define KEYBAORD_FILTER 1
