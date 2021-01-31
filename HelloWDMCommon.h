@@ -33,6 +33,8 @@ typedef struct _DEVICE_EXTENSION
   KTIMER         pollingTimer;
   KDPC           pollingDPC;
   HANDLE          hDevice;
+
+  PDEVICE_OBJECT  pAcpiDevice;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 #define arraysize(p)  (sizeof(p)/sizeof((p)[0]))
@@ -54,6 +56,11 @@ NTSTATUS HandleStartDevice(PDEVICE_EXTENSION pdx, PIRP pIrp);
 NTSTATUS HandleRemoveDevice(PDEVICE_EXTENSION pdx, PIRP Irp);
 NTSTATUS PnpQueryCapabilitiesHandler(IN PDEVICE_EXTENSION pdx, IN PIRP irp);
 NTSTATUS DeviceQueryDeviceRelation(PDEVICE_EXTENSION pdx, PIRP /* pIrp */);
+
+///
+/// other testing function
+///
+VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj);
 
 VOID OnTimer(
   IN PDEVICE_OBJECT pDevObj,

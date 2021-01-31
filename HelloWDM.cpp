@@ -62,6 +62,11 @@ NTSTATUS DriverEntry(
   return STATUS_SUCCESS;
 }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> d85aa204758d3f5fa4d76a4a45bd27c08c1e97bc
 PDEVICE_OBJECT mykdbDevice;
 
 NTSTATUS 
@@ -134,7 +139,13 @@ NTSTATUS HelloWDMAddDevice(
   PDEVICE_EXTENSION pdx = (PDEVICE_EXTENSION)fdo->DeviceExtension;
   pdx->fdo = fdo;
   memset(pdx->buffer, 0, sizeof(pdx->buffer));
+#if 0
   pdx->NextStackDevice = IoAttachDeviceToDeviceStack(fdo, PhysicalDeviceObject);
+#else
+  KdPrint(("Start call DriverCallDriver\n"));
+  DriverCallDriver(fdo);
+  KdPrint(("End call DriverCallDriver\n"));
+#endif
   KdPrint(("Print Device Address 0x%x\n", pdx->NextStackDevice));
 
   // register device's interface
