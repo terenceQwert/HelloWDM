@@ -62,11 +62,6 @@ NTSTATUS DriverEntry(
   return STATUS_SUCCESS;
 }
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> d85aa204758d3f5fa4d76a4a45bd27c08c1e97bc
 PDEVICE_OBJECT mykdbDevice;
 
 NTSTATUS 
