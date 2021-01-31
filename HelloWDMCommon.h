@@ -31,6 +31,8 @@ typedef struct _DEVICE_EXTENSION
   KTIMER         pollingTimer;
   KDPC           pollingDPC;
   HANDLE          hDevice;
+
+  PDEVICE_OBJECT  pAcpiDevice;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 #define arraysize(p)  (sizeof(p)/sizeof((p)[0]))

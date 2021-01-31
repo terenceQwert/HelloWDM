@@ -10,8 +10,27 @@ extern "C"
 #include "HelloWDMCommon.h"
 #include  "SimulateData.h"
 #include "Feature_Flag.h"
+#include <acpiioct.h>
+#include <wdmguid.h>
 
+#if 0
+VOID AcpiCall()
+{
+  ACPI_ENUM_CHILDREN_INPUT_BUFFER inputBuffer;
+  ACPI_ENUM_CHILDREN_OUTPUT_BUFFER outputSizeBuffer = { 0 };
+  ACPI_ENUM_CHILDREN_OUTPUT_BUFFER outputBuffer = { 0 };
+  ULONG bufferSize;
+  PACPI_ENUM_CHILD  childObject = NULL;
+  ULONG index;
 
+  NTSTATUS status;
+
+  inputBuffer.Signature = ACPI_ENUM_CHILDREN_INPUT_BUFFER_SIGNATURE;
+  
+}
+#endif
+
+#if 0
 VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj)
 {
   NTSTATUS Status = STATUS_SUCCESS;
@@ -25,6 +44,21 @@ VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj)
   RtlInitUnicodeString(&DeviceName, L"\\Device\\00000020");
   // initialize objAttributes
   InitializeObjectAttributes(&objAttributes, &DeviceName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  PDEVICE_OBJECT DeviceObject = NULL;
+  PFILE_OBJECT FileObject = NULL;
+  Status = IoGetDeviceObjectPointer(&DeviceName, FILE_ALL_ACCESS, &FileObject, &DeviceObject);
+  if (NT_SUCCESS(Status))
+  {
+    KdPrint(("IoGetDeviceObjectPoint () 0x%x\n", Status));
+    return;
+  }
+  KdPrint(("IoGetDeviceObjectPoint Success\n"));
+  KdPrint(("FileObject = 0x%x\n", FileObject));
+  KdPrint(("DeviceObject = 0x%x\n", DeviceObject));
+
+  pdx->pAcpiDevice = DeviceObject;
+
+#if 0
   Status = ZwCreateFile(
     &pdx->hDevice,
     FILE_READ_ATTRIBUTES | SYNCHRONIZE,
@@ -66,8 +100,9 @@ VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj)
     }
     ZwClose(pdx->hDevice);
   }
+#endif
 }
-
+#endif
 #pragma PAGEDCODE
 NTSTATUS HelloWDMRead(
   IN PDEVICE_OBJECT pDevObj,
@@ -76,7 +111,7 @@ NTSTATUS HelloWDMRead(
 
   KdPrint(("HelloWDMRead Entry\n"));
   NTSTATUS Status = STATUS_SUCCESS;
-  DriverCallDriver(pDevObj);
+//  DriverCallDriver(pDevObj);
 #if USE_IRP_PENDING 
   IoSetCancelRoutine(pIrp, CancelReadIrp);
   // pending this irp 

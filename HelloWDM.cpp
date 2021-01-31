@@ -62,6 +62,39 @@ NTSTATUS DriverEntry(
   return STATUS_SUCCESS;
 }
 
+VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj)
+{
+  NTSTATUS Status = STATUS_SUCCESS;
+  OBJECT_ATTRIBUTES objAttributes;
+  UNICODE_STRING  DeviceName;
+  PDEVICE_EXTENSION  pdx = (PDEVICE_EXTENSION)pDevObj->DeviceExtension;
+  RtlInitUnicodeString(&DeviceName, L"\\Device\\00000020");
+//  RtlInitUnicodeString(&DeviceName, L"\\Device\\0000003E");
+  // initialize objAttributes
+  InitializeObjectAttributes(&objAttributes, &DeviceName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  PDEVICE_OBJECT DeviceObject = NULL;
+  PFILE_OBJECT FileObject = NULL;
+  Status = IoGetDeviceObjectPointer(&DeviceName, FILE_ALL_ACCESS, &FileObject, &DeviceObject);
+  if (!NT_SUCCESS(Status))
+  {
+    KdPrint(("IoGetDeviceObjectPoint () 0x%x\n", Status));
+//    return;
+  }
+  KdPrint(("IoGetDeviceObjectPoint Success\n"));
+  KdPrint(("FileObject = 0x%x\n", FileObject));
+  KdPrint(("DeviceObject = 0x%x\n", DeviceObject));
+  PDEVICE_OBJECT TargetDevice = IoAttachDeviceToDeviceStack(pDevObj, DeviceObject);
+  if (!TargetDevice)
+  {
+    ObDereferenceObject(FileObject);
+    KdPrint(("IoattachDeviceToDeviceStack() 0x%x\n", Status));
+    return;
+  }
+  pdx->pAcpiDevice = DeviceObject;
+
+}
+
+
 
 #pragma PAGED_CODE
 NTSTATUS HelloWDMAddDevice(
@@ -101,7 +134,13 @@ NTSTATUS HelloWDMAddDevice(
   PDEVICE_EXTENSION pdx = (PDEVICE_EXTENSION)fdo->DeviceExtension;
   pdx->fdo = fdo;
   memset(pdx->buffer, 0, sizeof(pdx->buffer));
+#if 0
   pdx->NextStackDevice = IoAttachDeviceToDeviceStack(fdo, PhysicalDeviceObject);
+#else
+  KdPrint(("Start call DriverCallDriver\n"));
+  DriverCallDriver(fdo);
+  KdPrint(("End call DriverCallDriver\n"));
+#endif
   KdPrint(("Print Device Address 0x%x\n", pdx->NextStackDevice));
 
   // register device's interface
