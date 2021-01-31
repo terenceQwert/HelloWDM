@@ -6,6 +6,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+#include <ntddkbd.h>
 #include "HelloWDMCommon.h"
 #include "Feature_Flag.h"
 #pragma PAGEDCODE
@@ -66,7 +67,30 @@ NTSTATUS HelloWDMDispatchRoutine(IN PDEVICE_OBJECT /*fdo*/, IN PIRP pIrp)
   return status;
 }
 
-#if !KEYBAORD_FILTER
+ULONG pendingkey=0;
+NTSTATUS
+ReadComplete(PDEVICE_OBJECT , PIRP pIrp, PVOID )
+{
+  CHAR* keyflag[4] = { "keyDwon","keyUp","E0","E1" };
+  PKEYBOARD_INPUT_DATA keys =  (PKEYBOARD_INPUT_DATA)pIrp->AssociatedIrp.SystemBuffer;
+  int structnum = (int)(pIrp->IoStatus.Information / sizeof(KEYBOARD_INPUT_DATA));
+  int i;
+  if (pIrp->IoStatus.Status == STATUS_SUCCESS)
+  {
+    for(i=0;i<structnum;i++)
+    { 
+      KdPrint(("the scan code = %x (%s)\n", keys->MakeCode,keyflag[ keys->Flags]));
+    }
+  }
+  if (pIrp->PendingReturned) {
+    IoMarkIrpPending(pIrp);
+  }
+  pendingkey--;
+  return pIrp->IoStatus.Status;
+}
+
+
+#if KEYBAORD_FILTER
 #pragma PAGEDCODE
 NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
 {
@@ -83,7 +107,10 @@ NTSTATUS HelloWDMRead(IN PDEVICE_OBJECT pDevObj, IN PIRP pIrp)
   memcpy(pIrp->AssociatedIrp.SystemBuffer, pDevExt->buffer, ulReaLength);
   IoCompleteRequest(pIrp, IO_NO_INCREMENT);
 #else
-  IoSkipCurrentIrpStackLocation(pIrp);
+//  IoSkipCurrentIrpStackLocation(pIrp);
+  IoCopyCurrentIrpStackLocationToNext(pIrp);
+  IoSetCompletionRoutine(pIrp, ReadComplete, NULL,TRUE, TRUE,TRUE);
+  pendingkey++;
   Status = IoCallDriver(pDevExt->LowerDevice, pIrp);
 #endif
   KdPrint(("HelloWDMRead Exit\n"));

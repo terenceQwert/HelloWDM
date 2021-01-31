@@ -19,6 +19,7 @@ typedef struct _MYData
 typedef struct _DEVICE_EXTENSION
 {
   PDEVICE_OBJECT fdo;
+  PDEVICE_OBJECT my_kbdDevice;
   PDEVICE_OBJECT NextStackDevice;
   UNICODE_STRING  ustrDeviceName;
   UNICODE_STRING  ustrSymLinkName;

@@ -62,18 +62,20 @@ NTSTATUS DriverEntry(
   return STATUS_SUCCESS;
 }
 
-PDEVICE_OBJECT mykdbDevice;
 
+PDEVICE_OBJECT mykdbDevice;
 NTSTATUS 
 MyAttachDevice(PDRIVER_OBJECT DriverObject)
 {
   KdPrint(("Enter MyAttachDevice \n"));
   NTSTATUS status;
   UNICODE_STRING TargetDevice;
+  UNICODE_STRING  filterName;
   RtlInitUnicodeString(&TargetDevice, L"\\Device\\KeyboardClass0");
+  RtlInitUnicodeString(&filterName, L"kbd_filter");
   status = IoCreateDevice(
     DriverObject, sizeof(DEVICE_EXTENSION), 
-    NULL, FILE_DEVICE_KEYBOARD, 
+    &filterName, FILE_DEVICE_KEYBOARD,
     0, FALSE, &mykdbDevice);
   if (!NT_SUCCESS(status))
   {
@@ -232,14 +234,20 @@ NTSTATUS HelloWDMDispatch(IN PDEVICE_OBJECT , IN PIRP irp)
   return STATUS_SUCCESS;
 }
 
+extern ULONG pendingkey;
 #pragma
 void HelloWDMUnload(IN PDRIVER_OBJECT DriverObject)
 {
   PAGED_CODE();
+  LARGE_INTEGER interval = { 0 };
+  interval.QuadPart = -10 * 1000 * 1000; // 1 seconds
   PDEVICE_OBJECT  DeviceObject = DriverObject->DeviceObject;
   KdPrint(("Enter HelloWDMUnload\n"));
   PDEVICE_EXTENSION pDevExt = (PDEVICE_EXTENSION)DeviceObject->DeviceExtension;
   IoDetachDevice(pDevExt->LowerDevice);
+  while (pendingkey) {
+    KeDelayExecutionThread(KernelMode,FALSE, &interval);
+  }
   IoDeleteDevice(mykdbDevice);
 //  LinkListTest();
 //  DisplayProcessName();
