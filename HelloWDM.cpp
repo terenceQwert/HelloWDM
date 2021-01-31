@@ -96,6 +96,40 @@ VOID DriverCallDriver(IN PDEVICE_OBJECT pDevObj)
 
 
 
+PDEVICE_OBJECT mykdbDevice;
+NTSTATUS 
+MyAttachDevice(PDRIVER_OBJECT DriverObject)
+{
+  KdPrint(("Enter MyAttachDevice \n"));
+  NTSTATUS status;
+  UNICODE_STRING TargetDevice;
+  UNICODE_STRING  filterName;
+  RtlInitUnicodeString(&TargetDevice, L"\\Device\\KeyboardClass0");
+  RtlInitUnicodeString(&filterName, L"kbd_filter");
+  status = IoCreateDevice(
+    DriverObject, sizeof(DEVICE_EXTENSION), 
+    &filterName, FILE_DEVICE_KEYBOARD,
+    0, FALSE, &mykdbDevice);
+  if (!NT_SUCCESS(status))
+  {
+    KdPrint(("Enter MyAttachDevice cp 1 \n"));
+    return status;
+  }
+  mykdbDevice->Flags |= DO_BUFFERED_IO;
+  mykdbDevice->Flags &= ~DO_DEVICE_INITIALIZING;
+  RtlZeroMemory(mykdbDevice->DeviceExtension, sizeof(DEVICE_EXTENSION));
+  status = IoAttachDevice(mykdbDevice, &TargetDevice, &((PDEVICE_EXTENSION)mykdbDevice->DeviceExtension)->LowerDevice);
+  if (!NT_SUCCESS(status))
+  {
+    KdPrint(("Fail to do device attach \n"));
+    IoDeleteDevice(mykdbDevice);
+    return status;
+  }
+  KdPrint(("attach to \\Device\\KeyboardClass0 success \n"));
+  KdPrint(("Exit MyAttachDevice \n"));
+  return status;
+}
+
 #pragma PAGED_CODE
 NTSTATUS HelloWDMAddDevice(
   IN PDRIVER_OBJECT DriverObject, 
@@ -109,6 +143,7 @@ NTSTATUS HelloWDMAddDevice(
   PDEVICE_OBJECT fdo;
   UNICODE_STRING  devName;
   KdPrint(("HelloWDMAddDevice initialize unicode\n"));
+  MyAttachDevice(DriverObject);
   RtlInitUnicodeString(&devName, MYWDM_NAME);
   KdPrint(("HelloWDMAddDevice IoCreateDevice\n"));
   ntStatus = IoCreateDevice(
@@ -119,7 +154,8 @@ NTSTATUS HelloWDMAddDevice(
 #else
     NULL,
 #endif
-    FILE_DEVICE_UNKNOWN,
+//    FILE_DEVICE_UNKNOWN,
+    FILE_DEVICE_KEYBOARD,
     0,
     FALSE,
     &fdo
@@ -237,11 +273,21 @@ NTSTATUS HelloWDMDispatch(IN PDEVICE_OBJECT , IN PIRP irp)
   return STATUS_SUCCESS;
 }
 
+extern ULONG pendingkey;
 #pragma
-void HelloWDMUnload(IN PDRIVER_OBJECT )
+void HelloWDMUnload(IN PDRIVER_OBJECT DriverObject)
 {
   PAGED_CODE();
+  LARGE_INTEGER interval = { 0 };
+  interval.QuadPart = -10 * 1000 * 1000; // 1 seconds
+  PDEVICE_OBJECT  DeviceObject = DriverObject->DeviceObject;
   KdPrint(("Enter HelloWDMUnload\n"));
+  PDEVICE_EXTENSION pDevExt = (PDEVICE_EXTENSION)DeviceObject->DeviceExtension;
+  IoDetachDevice(pDevExt->LowerDevice);
+  while (pendingkey) {
+    KeDelayExecutionThread(KernelMode,FALSE, &interval);
+  }
+  IoDeleteDevice(mykdbDevice);
 //  LinkListTest();
 //  DisplayProcessName();
   KdPrint(("Leave HelloWDMUnload\n"));
