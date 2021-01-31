@@ -64,20 +64,24 @@ NTSTATUS DriverEntry(
 
 PDEVICE_OBJECT mykdbDevice;
 
+#define NOTEBOOK_KB_DEV_NAME L"\\Device\\KeyboardClass0"
+#define MY_FILTER_DEV_NAME L"\\Device\\kbdfilter_0"
 NTSTATUS 
 MyAttachDevice(PDRIVER_OBJECT DriverObject)
 {
   KdPrint(("Enter MyAttachDevice \n"));
   NTSTATUS status;
   UNICODE_STRING TargetDevice;
-  RtlInitUnicodeString(&TargetDevice, L"\\Device\\KeyboardClass0");
+  UNICODE_STRING myfilter;
+  RtlInitUnicodeString(&TargetDevice, NOTEBOOK_KB_DEV_NAME);
+  RtlInitUnicodeString(&myfilter, MY_FILTER_DEV_NAME);
   status = IoCreateDevice(
     DriverObject, sizeof(DEVICE_EXTENSION), 
-    NULL, FILE_DEVICE_KEYBOARD, 
+    &myfilter, FILE_DEVICE_KEYBOARD,
     0, FALSE, &mykdbDevice);
   if (!NT_SUCCESS(status))
   {
-    KdPrint(("Enter MyAttachDevice cp 1 \n"));
+    KdPrint(("Enter MyAttachDevice Error Status=0x%08x \n", status));
     return status;
   }
   mykdbDevice->Flags |= DO_BUFFERED_IO;
