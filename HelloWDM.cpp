@@ -62,20 +62,18 @@ NTSTATUS DriverEntry(
   return STATUS_SUCCESS;
 }
 
-
 PDEVICE_OBJECT mykdbDevice;
+
 NTSTATUS 
 MyAttachDevice(PDRIVER_OBJECT DriverObject)
 {
   KdPrint(("Enter MyAttachDevice \n"));
   NTSTATUS status;
   UNICODE_STRING TargetDevice;
-  UNICODE_STRING  filterName;
   RtlInitUnicodeString(&TargetDevice, L"\\Device\\KeyboardClass0");
-  RtlInitUnicodeString(&filterName, L"kbd_filter");
   status = IoCreateDevice(
     DriverObject, sizeof(DEVICE_EXTENSION), 
-    &filterName, FILE_DEVICE_KEYBOARD,
+    NULL, FILE_DEVICE_KEYBOARD, 
     0, FALSE, &mykdbDevice);
   if (!NT_SUCCESS(status))
   {
@@ -121,8 +119,7 @@ NTSTATUS HelloWDMAddDevice(
 #else
     NULL,
 #endif
-//    FILE_DEVICE_UNKNOWN,
-    FILE_DEVICE_KEYBOARD,
+    FILE_DEVICE_UNKNOWN,
     0,
     FALSE,
     &fdo
