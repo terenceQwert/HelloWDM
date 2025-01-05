@@ -13,6 +13,8 @@ extern "C"
 NTSTATUS DeviceQueryDeviceRelation(PDEVICE_EXTENSION pdx, PIRP /* pIrp */)
 {
   PAGED_CODE();
+  KdPrint(("DeviceQueryDeviceRelation Start \n"));
   KeCancelTimer(&pdx->pollingTimer);
+  KdPrint(("DeviceQueryDeviceRelation Exit \n"));
   return STATUS_SUCCESS;
 }
